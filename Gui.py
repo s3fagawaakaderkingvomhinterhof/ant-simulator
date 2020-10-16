@@ -6,6 +6,10 @@ import wx
 import wx.grid as gridlib
 
 import sys
+import time
+import threading
+
+from World import *
 
 cols = 7
 rows = 9
@@ -16,7 +20,7 @@ class GridFrame(wx.Frame):
         wx.Frame.__init__(self, parent, title='ant-simulator')
         self.columns = cols
         self.rows = rows
-        self.edge_length = 40
+        self.edge_length = 20
 
         self.grid = gridlib.Grid(self, -1)
         self.grid.CreateGrid(self.rows, self.columns)
@@ -26,6 +30,15 @@ class GridFrame(wx.Frame):
         self.set_dimensions_of_grid_field()
         self.coloring_grid_fields()
         self.grid.Bind(gridlib.EVT_GRID_CELL_LEFT_CLICK, self.single_left_click)
+
+        #####################
+        # other gui objects #
+        #####################
+        self.ant_world = World(self.rows, self.columns)  # 1st arg is rows(y-dimension), 2nd cols(x-dimension)
+
+        t = threading.Thread(target=self.game_loop)
+        t.daemon = True
+        t.start()
 
         self.SetSize(self.columns * self.edge_length + 16, self.rows * self.edge_length + 39)
         self.Center()
@@ -47,8 +60,39 @@ class GridFrame(wx.Frame):
                 self.grid.SetCellBackgroundColour(row, col, (33, 145, 63, 255))  # RGB color
 
     def single_left_click(self, event):
-        print('single_left_click')
-        print("current-x: %s, current-y: %s" % (event.GetCol(), event.GetRow()))
+        pos = [event.GetRow(), event.GetCol()]  # pos [y-coord, x-coord]
+        # print("current-x: %s, current-y: %s" % (event.GetCol(), event.GetRow()))
+        self.ant_world.increase_population(pos)
+        print(len(self.ant_world.population))
+
+    def game_loop(self):
+        i = 0
+        while True:
+            i += 1
+            time.sleep(1)
+            self.update_view()
+            self.ant_world.work_population()
+            print('step:', i)     # debugging
+
+    def update_view(self):
+        for row in range(0, self.rows):
+            for col in range(0, self.columns):
+                pos = [row, col]
+                self.grid.SetCellBackgroundColour(pos[0], pos[1], (255, 255, 255, 255))
+        for row in range(0, self.rows):
+            for col in range(0, self.columns):
+                pos = [row, col]
+                if self.ant_world.get_playground_field(pos) == 0 and pos != self.ant_world.get_ant_home_coord():
+                    self.grid.SetCellBackgroundColour(pos[0], pos[1], (33, 145, 63, 255))
+                else:
+                    if pos == self.ant_world.get_sugar_coord():
+                        self.grid.SetCellBackgroundColour(pos[0], pos[1], (255, 255, 255, 255))
+                    elif pos == self.ant_world.get_ant_home_coord():
+                        self.grid.SetCellBackgroundColour(pos[0], pos[1], (50, 40, 12, 255))
+                    else:
+                        self.grid.SetCellBackgroundColour(pos[0], pos[1], (255, 42, 0, 255))
+
+        self.grid.ForceRefresh()
 
 
 #################
