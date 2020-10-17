@@ -69,7 +69,7 @@ class GridFrame(wx.Frame):
         i = 0
         while True:
             i += 1
-            time.sleep(1)
+            time.sleep(0.5)
             self.update_view()
             self.ant_world.work_population()
             print('step:', i)     # debugging
