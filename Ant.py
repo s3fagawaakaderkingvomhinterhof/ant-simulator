@@ -25,7 +25,7 @@ class Ant:
     def __init__(self, pos, home, radius):
         self.pos = pos
         self.next_pos = pos
-        self.is_in_pack = False
+        self.is_in_pack = False     # change to Pack object
         self.my_home_pos = home
         self.my_sugar_pos = [-1, -1]
         self.exploration_radius = radius

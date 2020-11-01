@@ -16,3 +16,6 @@ class Field:
 
     def get_ant(self):
         return self.ant
+
+    def is_free(self):
+        return  # combination of ...

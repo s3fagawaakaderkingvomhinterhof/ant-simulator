@@ -3,6 +3,7 @@
 ######################
 from random import randrange
 from Ant import *
+from Field import *
 
 
 class World:
@@ -34,7 +35,7 @@ class World:
         return self.end_row
 
     def create_playground(self):
-        self.playground = [[0 for column in range(0, self.rows)] for row in range(self.columns)]
+        self.playground = [[Field for column in range(0, self.rows)] for row in range(self.columns)]
 
     def get_playground(self):
         return self.playground
